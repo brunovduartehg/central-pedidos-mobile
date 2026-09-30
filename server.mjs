@@ -12,8 +12,12 @@ http.createServer(async(req,res)=>{
   try{if(!upstream)throw Error('Serviço em configuração.');if(req.headers.origin&&new URL(req.headers.origin).host!==req.headers.host){res.writeHead(403);res.end(JSON.stringify({ok:false,error:'Origem inválida.'}));return;}
    let body='',bytes=0;for await(const chunk of req){bytes+=chunk.length;if(bytes>29000000)throw Error('Arquivo acima do limite.');body+=chunk;}
    const input=JSON.parse(body);if(!allowed.has(input.method)||!Array.isArray(input.args)||!/^[a-f0-9]{64}$/.test(input.args[0]?.token||''))throw Error('Use o link exclusivo da sua loja.');
-   const r=await fetch(upstream,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(input),redirect:'follow',signal:AbortSignal.timeout(110000)});
-   const result=await r.json();res.end(JSON.stringify(result));
+   const attempts=['snapshot','getMedia'].includes(input.method)?3:1;let result;
+   for(let attempt=0;attempt<attempts;attempt++){
+    try{const r=await fetch(upstream,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(input),redirect:'follow',signal:AbortSignal.timeout(45000)});if(!r.ok)throw Error('Upstream HTTP '+r.status);result=await r.json();break;}
+    catch(error){console.warn('Apps Script connection failed',input.method,attempt+1,error.cause?.code||error.name);if(attempt===attempts-1)throw error;await new Promise(resolve=>setTimeout(resolve,1000*(attempt+1)));}
+   }
+   res.end(JSON.stringify(result));
   }catch(e){res.statusCode=502;res.end(JSON.stringify({ok:false,error:'Não foi possível concluir. Atualize a lista antes de tentar novamente.'}));}return;
  }
  if(req.method==='GET'&&files[path]){try{const [f,t]=files[path];res.setHeader('Content-Type',t);res.end(await readFile(new URL(f,import.meta.url)));}catch{res.writeHead(500);res.end('Unavailable');}return;}
