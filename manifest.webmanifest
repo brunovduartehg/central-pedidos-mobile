@@ -1,0 +1,1 @@
+{"id": "/", "name": "Central de Pedidos", "short_name": "Pedidos", "lang": "pt-BR", "start_url": "/", "scope": "/", "display": "standalone", "background_color": "#101917", "theme_color": "#101917", "icons": [{"src": "/icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any"}]}
