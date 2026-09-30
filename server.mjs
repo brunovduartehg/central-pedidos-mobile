@@ -1,7 +1,7 @@
 import http from 'node:http';
 import {readFile} from 'node:fs/promises';
 const upstream=process.env.APPS_SCRIPT_URL;
-const files={'/':['index.html','text/html; charset=utf-8'],'/manifest.webmanifest':['manifest.webmanifest','application/manifest+json'],'/icon.png':['icon.png','image/png'],'/sw.js':['sw.js','text/javascript']};
+const files={'/':['index.html','text/html; charset=utf-8'],'/manifest.webmanifest':['manifest.webmanifest','application/manifest+json'],'/icon.png':['icon.png','image/png'],'/icon-192.png':['icon-192.png','image/png'],'/sw.js':['sw.js','text/javascript']};
 const allowed=new Set(['snapshot','getMedia','addOrder','editOrder','separateOrder','releaseBatch','respondBatch','receiveOrder','receiveOrders','receiveReturn','enqueueNotification']);
 http.createServer(async(req,res)=>{
  res.setHeader('Referrer-Policy','no-referrer');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Cache-Control','no-store');
